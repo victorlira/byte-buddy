@@ -67,6 +67,7 @@ import net.bytebuddy.utility.JavaType;
 import net.bytebuddy.utility.OpenedClassReader;
 import net.bytebuddy.utility.nullability.AlwaysNull;
 import net.bytebuddy.utility.nullability.MaybeNull;
+import net.bytebuddy.utility.nullability.UnknownNull;
 import net.bytebuddy.utility.visitor.ExceptionTableSensitiveMethodVisitor;
 import net.bytebuddy.utility.visitor.LineNumberPrependingMethodVisitor;
 import net.bytebuddy.utility.visitor.StackAwareMethodVisitor;
@@ -6625,6 +6626,12 @@ public class Advice implements AsmVisitorWrapper.ForDeclaredMethods.MethodVisito
             protected int currentFrameDivergence;
 
             /**
+             * Indicates that the return frame needs to be issued as a full frame to assure that the
+             * {@code this} value is considered initialized.
+             */
+            protected boolean requiresFullReturnFrame;
+
+            /**
              * Creates a new default stack map frame handler.
              *
              * @param instrumentedType   The instrumented type.
@@ -6649,6 +6656,7 @@ public class Advice implements AsmVisitorWrapper.ForDeclaredMethods.MethodVisito
                 this.preMethodTypes = preMethodTypes;
                 this.postMethodTypes = postMethodTypes;
                 this.expandFrames = expandFrames;
+                requiresFullReturnFrame = instrumentedMethod.isConstructor();
             }
 
             /**
@@ -6742,9 +6750,9 @@ public class Advice implements AsmVisitorWrapper.ForDeclaredMethods.MethodVisito
                                           List<? extends TypeDescription> additionalTypes,
                                           int type,
                                           int localVariableLength,
-                                          @MaybeNull Object[] localVariable,
+                                          @UnknownNull Object[] localVariable,
                                           int stackSize,
-                                          @MaybeNull Object[] stack) {
+                                          @UnknownNull Object[] stack) {
                 switch (type) {
                     case Opcodes.F_SAME:
                     case Opcodes.F_SAME1:
@@ -6760,6 +6768,9 @@ public class Advice implements AsmVisitorWrapper.ForDeclaredMethods.MethodVisito
                         break;
                     case Opcodes.F_FULL:
                     case Opcodes.F_NEW:
+                        if (requiresFullReturnFrame && localVariable[0] == Opcodes.UNINITIALIZED_THIS) {
+                            requiresFullReturnFrame = false;
+                        }
                         if (methodDescription.getParameters().size() + (methodDescription.isStatic() ? 0 : 1) > localVariableLength) {
                             throw new IllegalStateException("Inconsistent frame length for " + methodDescription + ": " + localVariableLength);
                         }
@@ -7152,7 +7163,7 @@ public class Advice implements AsmVisitorWrapper.ForDeclaredMethods.MethodVisito
                  * {@inheritDoc}
                  */
                 public void injectReturnFrame(MethodVisitor methodVisitor) {
-                    if (!expandFrames && currentFrameDivergence == 0) {
+                    if (!expandFrames && !requiresFullReturnFrame && currentFrameDivergence == 0) {
                         if (instrumentedMethod.getReturnType().represents(void.class)) {
                             methodVisitor.visitFrame(Opcodes.F_SAME, EMPTY.length, EMPTY, EMPTY.length, EMPTY);
                         } else {
@@ -7535,7 +7546,7 @@ public class Advice implements AsmVisitorWrapper.ForDeclaredMethods.MethodVisito
                  * {@inheritDoc}
                  */
                 public void injectReturnFrame(MethodVisitor methodVisitor) {
-                    if (!expandFrames && currentFrameDivergence == 0) {
+                    if (!expandFrames && !requiresFullReturnFrame && currentFrameDivergence == 0) {
                         if (adviceMethod.getReturnType().represents(void.class)) {
                             methodVisitor.visitFrame(Opcodes.F_SAME, EMPTY.length, EMPTY, EMPTY.length, EMPTY);
                         } else {
