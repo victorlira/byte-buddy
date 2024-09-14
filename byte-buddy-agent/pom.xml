@@ -228,7 +228,7 @@
             </build>
         </profile>
         <profile>
-            <id>java8Compilation</id>
+            <id>java8Artifact</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
@@ -240,7 +240,7 @@
                         <version>${version.plugin.resources}</version>
                         <executions>
                             <execution>
-                                <id>java8Compilation</id>
+                                <id>java8Artifact</id>
                                 <goals>
                                     <goal>copy-resources</goal>
                                 </goals>
@@ -266,7 +266,7 @@
                         <version>${version.plugin.compiler}</version>
                         <executions>
                             <execution>
-                                <id>java8Compilation</id>
+                                <id>java8Artifact</id>
                                 <goals>
                                     <goal>compile</goal>
                                 </goals>
@@ -283,7 +283,7 @@
                         <version>${version.plugin.jar}</version>
                         <executions>
                             <execution>
-                                <id>java8Compilation</id>
+                                <id>java8Artifact</id>
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
