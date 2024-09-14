@@ -153,7 +153,7 @@
                 </dependencies>
                 <executions>
                     <execution>
-                        <phase>prepare-package</phase>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>make-module</goal>
                         </goals>
@@ -220,6 +220,80 @@
                                         <argument>${project.basedir}/src/main/resources/win32-x86-64/attach_hotspot_windows.dll</argument>
                                         <argument>${project.basedir}/src/main/c/attach_hotspot_windows.c</argument>
                                     </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>java8Compilation</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>${version.plugin.resources}</version>
+                        <executions>
+                            <execution>
+                                <id>java8Compilation</id>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <phase>prepare-package</phase>
+                                <configuration>
+                                    <outputDirectory>${project.build.outputDirectory}/../classes-java8</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>target/classes</directory>
+                                            <includes>
+                                                <include>META-INF/**</include>
+                                                <include>win32*/**</include>
+                                            </includes>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>${version.plugin.compiler}</version>
+                        <executions>
+                            <execution>
+                                <id>java8Compilation</id>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.outputDirectory}/../classes-java8</outputDirectory>
+                                    <target>1.8</target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>${version.plugin.jar}</version>
+                        <executions>
+                            <execution>
+                                <id>java8Compilation</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <phase>package</phase>
+                                <configuration>
+                                    <classesDirectory>${project.build.outputDirectory}/../classes-java8</classesDirectory>
+                                    <classifier>java8</classifier>
+                                    <archive>
+                                        <manifestFile>${project.build.outputDirectory}/../classes-java8/META-INF/MANIFEST.MF</manifestFile>
+                                    </archive>
                                 </configuration>
                             </execution>
                         </executions>
