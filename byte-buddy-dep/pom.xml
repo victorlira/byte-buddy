@@ -1115,7 +1115,7 @@
             </build>
         </profile>
         <profile>
-            <id>java8Artifact</id>
+            <id>java5-artifact</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
@@ -1127,7 +1127,7 @@
                         <version>${version.plugin.resources}</version>
                         <executions>
                             <execution>
-                                <id>java8Artifact</id>
+                                <id>java5-artifact</id>
                                 <goals>
                                     <goal>copy-resources</goal>
                                 </goals>
@@ -1152,13 +1152,13 @@
                         <version>${version.plugin.compiler}</version>
                         <executions>
                             <execution>
-                                <id>java8Artifact</id>
+                                <id>java5-artifact</id>
                                 <goals>
                                     <goal>compile</goal>
                                 </goals>
                                 <configuration>
-                                    <outputDirectory>${project.build.outputDirectory}/../classes-java8</outputDirectory>
-                                    <target>1.8</target>
+                                    <outputDirectory>${project.build.outputDirectory}/../classes-java5</outputDirectory>
+                                    <target>1.5</target>
                                 </configuration>
                             </execution>
                         </executions>
@@ -1169,14 +1169,14 @@
                         <version>${version.plugin.jar}</version>
                         <executions>
                             <execution>
-                                <id>java8Artifact</id>
+                                <id>java5-artifact</id>
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
                                 <phase>package</phase>
                                 <configuration>
-                                    <classesDirectory>${project.build.outputDirectory}/../classes-java8</classesDirectory>
-                                    <classifier>java8</classifier>
+                                    <classesDirectory>${project.build.outputDirectory}/../classes-java5</classesDirectory>
+                                    <classifier>java5</classifier>
                                 </configuration>
                             </execution>
                         </executions>
